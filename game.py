@@ -4,15 +4,50 @@
 
 import os
 import time
+import random
 
-def game(turn, gamedict):
-    os.system('cls') #clear the screen every turn
+def comp_game(turn,gamedict,comp):
     gameend=False
     if gamedict=="start":
-        turn=True #"X"-player start the game (if False -> "O"-player start)
+        os.system('cls') #clear the screen before game initilization
+        turn=True #by default the "X"-player start the game (if False -> "O"-player start)
         fielddict = {"1":".","2":".","3":".","4":".","5":".","6":".","7":".","8":".","9":"."}
-    else:
+        #fielddict - Main dictionary, field values are stored in this variable, the dictionary is transferred by recursion
+        
+        print("Do you want to play with each other, or with the computer?\n") 
+        inp=None
+        while ((inp!="C") and (inp!="P")):  #Choice of the opponent
+            inp=input('Choose C for Computer, P for Player: ')
+            if type(inp)==str:
+                inp=inp.upper()
+                if ((inp=="P") or (inp=="C")):
+                        continue
+                else:
+                    print('Please, insert P or insert C letter')
+                    continue
+            else:
+                print('Please, insert P or insert C letter')
+                continue
+        if inp=="C":            #Choice of the side
+            print('\nWho do you want to play? For "X" or for "O"?')
+            while ((inp!="X") and (inp!="O")):  
+                inp=input('Choose X\O: ')
+                if type(inp)==str:
+                    inp=inp.upper()
+                    if ((inp=="X") or (inp=="O")):
+                        comp=inp
+                        continue
+                    else:
+                        print('Please, insert X or insert O letter')
+                        continue
+                else:
+                    print('Please, insert X or insert O letter')
+                    continue
+        del inp
+    else:#For all subsequent recursive iterations except the initial iteration. Passing dictionary value -> values on grid.
         fielddict=gamedict
+
+    os.system('cls') #clear the screen every turn
 
     #n's transfer cell value from dictionary to grid
     n1,n2,n3,n4,n5,n6,n7,n8,n9 = [list(fielddict.items())[0][1],list(fielddict.items())[1][1]\
@@ -33,9 +68,7 @@ def game(turn, gamedict):
     |7    |8    |9    |\n\
     |  {n7}  |  {n8}  |  {n9}  |\n\
     |_____|_____|_____|\n    "stop" for endgame\n'
-
     print(line)
-    # print('Choose "stop" to interrupt the game')
 
     if turn==True:
         print('Player "X" turn\n')
@@ -66,36 +99,59 @@ def game(turn, gamedict):
         time.sleep(1.5)
         quit()
 
-    goodchoice = ["1","2","3","4","5","6","7","8","9"]
-    flag=True
-    while flag==True:
-        choice = input("Choice area (1-9): ")
-        if choice == "stop":
-            print("You choosed to end the game.\nGame will close in 5 seconds.")
-            time.sleep(5)
-            quit()
-        if not choice in goodchoice:
-            print("Please, insert number between 1 and 9")
-            continue
-        if (fielddict[choice]=="X") or (fielddict[choice]=="O"):
-            print("This area is already taken. Please choose another area :)")
-            continue           
-        if choice in goodchoice:
-            flag=False
-            if turn==True:
-                fielddict[choice]="X"
-            else:
-                fielddict[choice]="O"
-            turn = not turn
-            break
-    game(turn, fielddict)
+
+    #Computer step (it chooses an area randomly)
+    if ((comp=="O") and (turn==True)) or ((comp=="X") and (turn==False)):
+        print("Computer's turn")
+        time.sleep(random.uniform(1.5, 2.5))
+        complist = []
+        for key in fielddict:
+            if fielddict.get(key)==".":
+                complist.append(key)
+        random.shuffle(complist)
+        choice=complist[0]
+        if turn==True:
+            fielddict[choice]="X"
+        else:
+            fielddict[choice]="O"
+        del complist
+        turn = not turn
+        comp_game(turn,fielddict,comp)
+
+
+    #Player step    
+    else:
+        goodchoice = ["1","2","3","4","5","6","7","8","9"]
+        flag=True
+        while flag==True:
+            choice = input("Choice area (1-9): ")
+            if choice == "stop":
+                print("You choosed to end the game.\nGame will close in 3 seconds.")
+                time.sleep(3)
+                os.system('cls')
+                quit()
+            if not choice in goodchoice:
+                print("Please, insert number between 1 and 9")
+                continue
+            if (fielddict[choice]=="X") or (fielddict[choice]=="O"):
+                print("This area is already taken. Please choose another area :)")
+                continue           
+            if choice in goodchoice:
+                flag=False
+                if turn==True:
+                    fielddict[choice]="X"
+                else:
+                    fielddict[choice]="O"
+                turn = not turn
+                break
+        comp_game(turn,fielddict,comp)
 ######################### End of game code ######################### 
 ######################### The game code is completely written by RachinskyGIT ######################### 
 #########################           https://github.com/RachinskyGIT           ######################### 
 
 
         
-game(0,"start")
+comp_game(0,"start",0)
 
 
 
